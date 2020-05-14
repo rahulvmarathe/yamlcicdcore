@@ -1,0 +1,27 @@
+parameters:
+- name: steps
+- name: buildSteps
+
+stages:
+- stage: dev
+  displayName: Dev envrionment
+  jobs:
+  - job: Job01
+    displayName: Build
+    pool:
+      vmImage: 'ubuntu-latest'
+    steps:
+    - template: ${{parameters.buildSteps}}
+  - deployment: Job02
+    displayName: Deploy azure resource group
+    environment: 'dev'
+    dependsOn: 'job01'
+    pool:
+      vmImage: 'Ubuntu-16.04'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - template: ${{parameters.steps}}
+            parameters:
+              azureServiceConnection: 'Azure Stage'
